@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_image.h>
 #include <rapidjson/document.h>
 #include <algorithm>
 #include <vector>
+
+#include "sound.h"
 
 const int MAX_BUF_LEN = 1024;
 const int MAX_FILE_LEN = 131072;
@@ -14,8 +14,8 @@ char buf[MAX_BUF_LEN];
 char str[MAX_FILE_LEN];
 std::vector<double> tim;
 
-Mix_Music * bgm;
-Mix_Chunk * se_beat;
+Music bgm;
+Sound se_beat;
 SDL_Window * MainWindow = NULL;
 SDL_Surface* ScreenSurface = NULL;
 SDL_Surface* Background = NULL;
@@ -27,11 +27,8 @@ bool init() {
         return false;
     }
 
-    // Initialize SDL_mixer
-    if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 512) < 0) {
-        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+    if (!mixer_init())
         return false;
-    }
 
     // Initialize SDL_image
     int imgFlags = IMG_INIT_PNG;
@@ -52,18 +49,9 @@ bool init() {
     return true; 
 }
 
-bool load_sound() {
-    se_beat = Mix_LoadWAV("res/snd/beat.wav");
-    if (se_beat == NULL) {
-        printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
-        return false;
-    }
-    bgm = Mix_LoadMUS("res/song/citanLu/song_full.ogg");
-    if (bgm == NULL) {
-        printf("Failed to load gameplay music! SDL_mixer Error: %s\n", Mix_GetError());
-        return false;
-    }
-    return true;
+void load_sound() {
+    se_beat.load("res/snd/beat.wav");
+    bgm.load("res/song/citanLu/song_full.ogg");
 }
 
 bool load_texture() {
@@ -92,9 +80,9 @@ bool parsejson() {
 
 void main_loop() {
     Uint32 startTime = SDL_GetTicks();
-    Mix_PlayMusic(bgm, -1);
+    bgm.play();
+    printf("%d %d\n", SDL_GetTicks(), startTime);
     int offset = 0;
-    printf("%d\n", startTime);
     SDL_Surface * optimizedSurface = SDL_ConvertSurface(Background, ScreenSurface->format, NULL);
     SDL_Rect stretchRect;
     stretchRect.x = 0;
@@ -102,7 +90,6 @@ void main_loop() {
     stretchRect.w = SCREEN_WIDTH;
     stretchRect.h = SCREEN_HEIGHT;
     SDL_BlitScaled(optimizedSurface, NULL, ScreenSurface, &stretchRect);
-    //SDL_BlitSurface(Background, NULL, ScreenSurface, NULL);
     SDL_UpdateWindowSurface(MainWindow);
 
     uint p = 0;
@@ -126,7 +113,7 @@ void main_loop() {
         }
         loop_cnt++;
             while (p < tim.size() && offset + SDL_GetTicks() - startTime > tim[p] * 1000) {
-                Mix_PlayChannel(-1, se_beat, 0);
+                se_beat.play();
                 printf("Note %3d: %03.4lf\n", p, tim[p]);
                 p++;
             }
@@ -136,10 +123,6 @@ void main_loop() {
 }
 
 void finalize() {
-    Mix_FreeMusic(bgm);
-    bgm = NULL;
-    Mix_FreeChunk(se_beat);
-    se_beat = NULL;
     SDL_FreeSurface(Background);
     Background = NULL;
     SDL_FreeSurface(ScreenSurface);
@@ -153,8 +136,7 @@ int main(int argc, char * argv[])
         return 1;
     if (!parsejson())
         return 1;
-    if (!load_sound())
-        return 1;
+    load_sound();
     if (!load_texture())
         return 1;
     main_loop();
