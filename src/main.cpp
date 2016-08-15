@@ -6,19 +6,19 @@
 #include <vector>
 
 #include "sound.h"
+#include "track.h"
+#include "common.h"
 
-const int MAX_BUF_LEN = 1024;
-const int MAX_FILE_LEN = 131072;
-const int SCREEN_WIDTH = 1024, SCREEN_HEIGHT = 768;
-char buf[MAX_BUF_LEN];
-char str[MAX_FILE_LEN];
 std::vector<double> tim;
 
 Music bgm;
 Sound se_beat;
-SDL_Window * MainWindow = NULL;
-SDL_Surface* ScreenSurface = NULL;
-SDL_Surface* Background = NULL;
+Tracks tracks;
+SDL_Window* MainWindow;
+SDL_Renderer* Renderer;
+SDL_Surface* ScreenSurface;
+SDL_Texture* Background;
+SDL_Texture* Note;
 
 bool init() {
     // Initialize SDL
@@ -37,7 +37,7 @@ bool init() {
        return false;
     }
 
-	// Create window
+    // Create window
     MainWindow = SDL_CreateWindow("VOEZER - citanLu.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (MainWindow == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -45,6 +45,8 @@ bool init() {
     } else {
         // Get window surface
         ScreenSurface = SDL_GetWindowSurface(MainWindow);
+        Renderer = SDL_CreateRenderer(MainWindow, -1, SDL_RENDERER_ACCELERATED);
+        SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
     }
     return true; 
 }
@@ -55,42 +57,57 @@ void load_sound() {
 }
 
 bool load_texture() {
-    Background = IMG_Load("res/song/citanLu/image_blur.png");
-    if (Background == NULL) {
-        printf("Load image error! SDL Error: %s\n", SDL_GetError());
+    Background = NULL;
+    SDL_Surface * loadedSurface = IMG_Load("res/song/citanLu/image_blur.png");
+    if (loadedSurface == NULL) {
+        printf("Load image error! SDL_image Error: %s\n", IMG_GetError());
         return false;
     }
+    Background = SDL_CreateTextureFromSurface(Renderer, loadedSurface);
+    if (Background == NULL) {
+        printf("Load image error! SDL_image Error: %s\n", IMG_GetError());
+        return false;
+    }
+    SDL_FreeSurface(loadedSurface);
     return true;
 }
 
 bool parsejson() {
+    //tracks = Tracks("res/song/citanLu/track.extra.txt", Renderer);
+    tracks = Tracks("res/song/track.extra.3.txt", Renderer);
+
     FILE * input_file = fopen("res/song/citanLu/note.extra.txt", "r");
     if (input_file == NULL)
         return false;
     while (fgets(buf, MAX_BUF_LEN, input_file) != NULL)
         strcat(str, buf);
     fclose(input_file);
+
     rapidjson::Document doc;
     doc.Parse(str);
+    
     for (rapidjson::SizeType i = 0; i < doc.Size(); ++i)
         tim.push_back(doc[i]["Time"].GetDouble());
+
+    memset(buf, 0, sizeof(buf));
+    memset(str, 0, sizeof(str));
+
     std::sort(tim.begin(), tim.end());
     return true;
 }
+
+void DrawTrack(int x, int track_width) {
+    SDL_Rect fillRect = {x - track_width / 2, 0, track_width, SCREEN_HEIGHT};
+    SDL_SetRenderDrawColor(Renderer, 128, 0, 0, 96);
+    SDL_RenderFillRect(Renderer, &fillRect);
+}
+
 
 void main_loop() {
     Uint32 startTime = SDL_GetTicks();
     bgm.play();
     printf("%d %d\n", SDL_GetTicks(), startTime);
     int offset = 0;
-    SDL_Surface * optimizedSurface = SDL_ConvertSurface(Background, ScreenSurface->format, NULL);
-    SDL_Rect stretchRect;
-    stretchRect.x = 0;
-    stretchRect.y = 0;
-    stretchRect.w = SCREEN_WIDTH;
-    stretchRect.h = SCREEN_HEIGHT;
-    SDL_BlitScaled(optimizedSurface, NULL, ScreenSurface, &stretchRect);
-    SDL_UpdateWindowSurface(MainWindow);
 
     uint p = 0;
     bool quit = false;
@@ -111,22 +128,36 @@ void main_loop() {
                 }
             }
         }
+
+        double time = double(SDL_GetTicks() - startTime) / 1000;
+        //printf("%.10lf\n", time);
         loop_cnt++;
-            while (p < tim.size() && offset + SDL_GetTicks() - startTime > tim[p] * 1000) {
-                se_beat.play();
-                printf("Note %3d: %03.4lf\n", p, tim[p]);
-                p++;
-            }
+
+        // Put Background
+        SDL_RenderCopy(Renderer, Background, NULL, NULL);
+
+        tracks.Draw(time);
+
+        // Put shadow downside
+        SDL_Rect fillRect = {0, SCREEN_HEIGHT / 6 * 5, SCREEN_WIDTH, SCREEN_HEIGHT / 6};
+        SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 128);
+        SDL_RenderFillRect(Renderer, &fillRect);
+
+        // Render
+        SDL_RenderPresent(Renderer);
+        
+        while (p < tim.size() && offset + SDL_GetTicks() - startTime > tim[p] * 1000) {
+            se_beat.play();
+            printf("Note %3d: %03.4lf\n", p, time);
+            p++;
+        }
     }
     printf("%d\n", loop_cnt);
-    printf("%.10lf\n", (double)loop_cnt / (SDL_GetTicks() - startTime));
+    printf("Loop per millisecond: %.10lf\n", (double)loop_cnt / (SDL_GetTicks() - startTime));
 }
 
 void finalize() {
-    SDL_FreeSurface(Background);
-    Background = NULL;
-    SDL_FreeSurface(ScreenSurface);
-    ScreenSurface = NULL;
+    IMG_Quit();
     SDL_Quit();
 }
 
