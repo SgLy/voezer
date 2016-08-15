@@ -32,6 +32,9 @@
 *.out
 *.app
 
+# Python binaries
+*.pyc
+
 # for voezer only
 res/
 bin/
