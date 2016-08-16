@@ -35,6 +35,9 @@
 # Python binaries
 *.pyc
 
+# Vim temporary files
+.*.swp
+
 # for voezer only
 res/
 bin/
