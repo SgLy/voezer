@@ -101,23 +101,23 @@ double Track::GetValue(const std::vector<TrackAction> &actions, double time, dou
     return res;
 }
 
-double Track::GetPosition(double time) {
-    return GetValue(move, time, x);
+int Track::GetPosition(double time) {
+    double ratio = GetValue(move, time, x);
+    double pos = ratio * (SCREEN_WIDTH - 2 * TRACK_BASIC_WIDTH) + TRACK_BASIC_WIDTH;
+    return int(round(pos));
 }
 
-double Track::GetSize(double time) {
-    return GetValue(scale, time, size);
+int Track::GetSize(double time) {
+    double ratio = GetValue(scale, time, size);
+    return int(round(ratio * TRACK_BASIC_WIDTH));
 }
 
 void Track::Draw(double time, SDL_Renderer * Renderer) {
     if (time < start || end < time)
         return;
-    int width = SCREEN_WIDTH / 10;
-    double pos = GetPosition(time);
-    pos = pos * (SCREEN_WIDTH - 2 * width) + width;
-    pos = round(pos);
-    int size = int(round(GetSize(time) * width));
-    SDL_Rect fillRect = {int(pos) - size / 2, 0, size, SCREEN_HEIGHT};
+    int pos = GetPosition(time);
+    int size = GetSize(time);
+    SDL_Rect fillRect = {pos - size / 2, 0, size, SCREEN_HEIGHT};
     SDL_SetRenderDrawColor(Renderer, 128, 0, 0, 96);
     SDL_RenderFillRect(Renderer, &fillRect);
 }
