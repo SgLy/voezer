@@ -7,13 +7,13 @@
 
 #include "sound.h"
 #include "track.h"
+#include "note.h"
 #include "common.h"
-
-std::vector<double> tim;
 
 Music bgm;
 Sound se_beat;
 Tracks tracks;
+Pattern pattern;
 SDL_Window* MainWindow;
 SDL_Renderer* Renderer;
 SDL_Surface* ScreenSurface;
@@ -74,24 +74,7 @@ bool load_texture() {
 
 bool parsejson() {
     tracks = Tracks("res/song/Gamegame/track.extra.txt", Renderer);
-
-    FILE * input_file = fopen("res/song/Gamegame/note.extra.txt", "r");
-    if (input_file == NULL)
-        return false;
-    while (fgets(buf, MAX_BUF_LEN, input_file) != NULL)
-        strcat(str, buf);
-    fclose(input_file);
-
-    rapidjson::Document doc;
-    doc.Parse(str);
-    
-    for (rapidjson::SizeType i = 0; i < doc.Size(); ++i)
-        tim.push_back(doc[i]["Time"].GetDouble());
-
-    memset(buf, 0, sizeof(buf));
-    memset(str, 0, sizeof(str));
-
-    std::sort(tim.begin(), tim.end());
+    pattern = Pattern("res/song/Gamegame/note.extra.txt", Renderer, &se_beat);
     return true;
 }
 
@@ -105,10 +88,7 @@ void DrawTrack(int x, int track_width) {
 void main_loop() {
     Uint32 startTime = SDL_GetTicks();
     bgm.play();
-    printf("%d %d\n", SDL_GetTicks(), startTime);
-    int offset = 0;
 
-    uint p = 0;
     bool quit = false;
     SDL_Event e;
     int loop_cnt = 0;
@@ -129,7 +109,6 @@ void main_loop() {
         }
 
         double time = double(SDL_GetTicks() - startTime) / 1000;
-        //printf("%.10lf\n", time);
         loop_cnt++;
 
         // Put Background
@@ -145,11 +124,7 @@ void main_loop() {
         // Render
         SDL_RenderPresent(Renderer);
         
-        while (p < tim.size() && offset + SDL_GetTicks() - startTime > tim[p] * 1000) {
-            se_beat.play();
-            printf("Note %3d: %03.4lf\n", p, time);
-            p++;
-        }
+        pattern.Play(time);
     }
     printf("%d\n", loop_cnt);
     printf("Loop per millisecond: %.10lf\n", (double)loop_cnt / (SDL_GetTicks() - startTime));
@@ -164,9 +139,9 @@ int main(int argc, char * argv[])
 {
     if (!init())
         return 1;
+    load_sound();
     if (!parsejson())
         return 1;
-    load_sound();
     if (!load_texture())
         return 1;
     main_loop();

@@ -5,7 +5,7 @@ LOCAL_INCLUDE = -Iinclude
 DEBUG = -Wall -g3
 CXXFLAGS = -std=c++11 $(SDL_INCLUDE) $(RAPID_JSON_INCLUDE) $(LOCAL_INCLUDE) $(DEBUG)
 LDFLAGS = $(SDL_LIB)
-LIB = bin/sound.o bin/track.o bin/common.o
+LIB = bin/sound.o bin/track.o bin/common.o bin/note.o
 
 BIN_DIR = bin
 SRC_DIR = src
@@ -24,6 +24,10 @@ bin/sound.o: src/sound.cpp src/sound.h
 
 bin/track.o: src/track.cpp src/track.h
 	$(CXX) -c src/track.cpp -o bin/track.o $(CXXFLAGS) $(LDFLAGS)
+
+
+bin/note.o: src/note.cpp src/note.h
+	$(CXX) -c src/note.cpp -o bin/note.o $(CXXFLAGS) $(LDFLAGS)
 
 clean:
 	rm -rf $(BIN_DIR)
