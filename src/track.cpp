@@ -73,73 +73,50 @@ void Track::read_track(const rapidjson::Value &val) {
     }
 }
 
-double Track::GetPosition(double time) {
-    double res = x;
+double Track::GetValue(const std::vector<TrackAction> &actions, double time, double init) {
+    double res = init;
 
-    if (move.size() > 0) {
-        TrackAction lastmove = move[move.size() - 1];
-        if (time > lastmove.end)
-            res = lastmove.to;
-    }
+    if (actions.size() > 0)
+        if (time > actions.back().end)
+            res = actions.back().to;
 
-    for (int i = 0; i < move.size(); ++i) {
-        TrackAction action = move[i];
+    for (uint i = 0; i < actions.size(); ++i) {
+        TrackAction action = actions[i];
         if (action.start <= time && time <= action.end) {
-            //if (action.ease == EASE_LINEAR) {
-                res = action.to - action.from;
-                res /= action.end - action.start;
-                res *= time - action.start;
-                res += action.from;
-            //}
+            if (action.ease == EASE_LINEAR)
+                res = linear(action.start, action.end, action.from, action.to, time);
+            else if (action.ease == EASE_OUT_CIRC)
+                res = incirc(action.start, action.end, action.from, action.to, time);
+            else if (action.ease == EASE_IN_CIRC)
+                res = outcirc(action.start, action.end, action.from, action.to, time);
             return res;
         }
-        if (i + 1 == move.size())
+        if (i + 1 == actions.size())
             continue;
 
-        TrackAction next_action = move[i + 1];
+        TrackAction next_action = actions[i + 1];
         if (action.end <= time && time <= next_action.start)
             return action.to; 
     }
     return res;
 }
 
+double Track::GetPosition(double time) {
+    return GetValue(move, time, x);
+}
+
 double Track::GetSize(double time) {
-    double res = size;
-
-    if (scale.size() > 0) {
-        TrackAction lastscale = scale[scale.size() - 1];
-        if (time > lastscale.end)
-            res = lastscale.to;
-    }
-
-    for (int i = 0; i < scale.size(); ++i) {
-        TrackAction action = scale[i];
-        if (action.start <= time && time <= action.end) {
-            //if (action.ease == EASE_LINEAR) {
-                res = action.to - action.from;
-                res /= action.end - action.start;
-                res *= time - action.start;
-                res += action.from;
-            //}
-            return res;
-        }
-        if (i + 1 == scale.size())
-            continue;
-
-        TrackAction next_action = scale[i + 1];
-        if (action.end <= time && time <= next_action.start)
-            return action.to; 
-    }
-    return res;
+    return GetValue(scale, time, size);
 }
 
 void Track::Draw(double time, SDL_Renderer * Renderer) {
     if (time < start || end < time)
         return;
+    int width = SCREEN_WIDTH / 10;
     double pos = GetPosition(time);
-    pos = pos * (SCREEN_WIDTH - 160) + 80;
+    pos = pos * (SCREEN_WIDTH - 2 * width) + width;
     pos = round(pos);
-    int size = int(round(GetSize(time) * 80));
+    int size = int(round(GetSize(time) * width));
     SDL_Rect fillRect = {int(pos) - size / 2, 0, size, SCREEN_HEIGHT};
     SDL_SetRenderDrawColor(Renderer, 128, 0, 0, 96);
     SDL_RenderFillRect(Renderer, &fillRect);
@@ -163,4 +140,6 @@ void TrackAction::read_action(const rapidjson::Value &val) {
         ease = EASE_LINEAR;
     if (s == "easeoutcirc")
         ease = EASE_OUT_CIRC;
+    if (s == "easeincirc")
+        ease = EASE_IN_CIRC;
 }

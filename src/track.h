@@ -31,6 +31,7 @@ public:
     Track();
     Track(const rapidjson::Value &val);
     void Draw(double time, SDL_Renderer * Renderer);
+    double GetValue(const std::vector<TrackAction> &actions, double time, double init);
     double GetPosition(double time);
     double GetSize(double time);
 

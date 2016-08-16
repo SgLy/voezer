@@ -16,14 +16,14 @@ main: src/main.cpp bin $(LIB)
 bin:
 	mkdir bin
 
+bin/common.o: src/common.cpp src/common.h
+	$(CXX) -c src/common.cpp -o bin/common.o $(CXXFLAGS) $(LDFLAGS)
+
 bin/sound.o: src/sound.cpp src/sound.h
 	$(CXX) -c src/sound.cpp -o bin/sound.o $(CXXFLAGS) $(LDFLAGS)
 
 bin/track.o: src/track.cpp src/track.h
 	$(CXX) -c src/track.cpp -o bin/track.o $(CXXFLAGS) $(LDFLAGS)
-
-bin/common.o: src/common.cpp src/common.h
-	$(CXX) -c src/common.cpp -o bin/common.o $(CXXFLAGS) $(LDFLAGS)
 
 clean:
 	rm -rf $(BIN_DIR)
