@@ -49,6 +49,7 @@ public:
     Tracks();
     Tracks(const char address[], SDL_Renderer * Renderer_);
     void Draw(double time);
+    Track * operator[] (int x);
 
 private:
     void attach_renderer(SDL_Renderer * Renderer_);

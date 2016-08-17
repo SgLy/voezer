@@ -32,9 +32,14 @@ void Tracks::read_pattern(const char address[]) {
 }
 
 void Tracks::Draw(double time) {
-    for (auto t: track) {
+    for (auto t: track)
         t.Draw(time, Renderer);
-    }
+}
+    
+Track * Tracks::operator[] (int x) {
+    for (uint i = 0; i < track.size(); ++i)
+        if (track[i].id == x)
+            return &track[i];
 }
 
 // Class Track definition
@@ -83,12 +88,7 @@ double Track::GetValue(const std::vector<TrackAction> &actions, double time, dou
     for (uint i = 0; i < actions.size(); ++i) {
         TrackAction action = actions[i];
         if (action.start <= time && time <= action.end) {
-            if (action.ease == EASE_LINEAR)
-                res = linear(action.start, action.end, action.from, action.to, time);
-            else if (action.ease == EASE_OUT_CIRC)
-                res = incirc(action.start, action.end, action.from, action.to, time);
-            else if (action.ease == EASE_IN_CIRC)
-                res = outcirc(action.start, action.end, action.from, action.to, time);
+            res = EASE_FUNC[action.ease](action.start, action.end, action.from, action.to, time);
             return res;
         }
         if (i + 1 == actions.size())
@@ -136,10 +136,21 @@ void TrackAction::read_action(const rapidjson::Value &val) {
     start = val["Start"].GetDouble();
     end = val["End"].GetDouble();
     std::string s = val["Ease"].GetString();
+    ease = -1;
     if (s == "easelinear")
         ease = EASE_LINEAR;
     if (s == "easeoutcirc")
         ease = EASE_OUT_CIRC;
     if (s == "easeincirc")
         ease = EASE_IN_CIRC;
+    if (s == "easeinquad")
+        ease = EASE_IN_QUAD;
+    if (s == "easeoutquad")
+        ease = EASE_OUT_QUAD;
+    if (s == "easeinoutquad")
+        ease = EASE_INOUT_QUAD;
+    if (ease == -1) {
+        printf("New easing function: %s\n", val["Ease"].GetString());
+        ease = EASE_LINEAR;
+    }
 }

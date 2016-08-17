@@ -10,7 +10,7 @@
 #include "note.h"
 #include "common.h"
 
-Music bgm;
+Sound bgm;
 Sound se_beat;
 Tracks tracks;
 Pattern pattern;
@@ -38,7 +38,7 @@ bool init() {
     }
 
     // Create window
-    MainWindow = SDL_CreateWindow("VOEZER - Gamegame.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    MainWindow = SDL_CreateWindow("VOEZER - WarpDrive.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (MainWindow == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
@@ -53,12 +53,12 @@ bool init() {
 
 void load_sound() {
     se_beat.load("res/snd/beat.wav");
-    bgm.load("res/song/Gamegame/song_full.ogg");
+    bgm.load("res/song/WarpDrive/song_full.ogg");
 }
 
 bool load_texture() {
     Background = NULL;
-    SDL_Surface * loadedSurface = IMG_Load("res/song/Gamegame/image_blur.png");
+    SDL_Surface * loadedSurface = IMG_Load("res/song/WarpDrive/image_blur.png");
     if (loadedSurface == NULL) {
         printf("Load image error! SDL_image Error: %s\n", IMG_GetError());
         return false;
@@ -73,17 +73,10 @@ bool load_texture() {
 }
 
 bool parsejson() {
-    tracks = Tracks("res/song/Gamegame/track.extra.txt", Renderer);
-    pattern = Pattern("res/song/Gamegame/note.extra.txt", Renderer, &se_beat);
+    tracks = Tracks("res/song/WarpDrive/track.extra.txt", Renderer);
+    pattern = Pattern("res/song/WarpDrive/note.extra.txt", Renderer, &se_beat, &tracks);
     return true;
 }
-
-void DrawTrack(int x, int track_width) {
-    SDL_Rect fillRect = {x - track_width / 2, 0, track_width, SCREEN_HEIGHT};
-    SDL_SetRenderDrawColor(Renderer, 128, 0, 0, 96);
-    SDL_RenderFillRect(Renderer, &fillRect);
-}
-
 
 void main_loop() {
     Uint32 startTime = SDL_GetTicks();
@@ -115,6 +108,7 @@ void main_loop() {
         SDL_RenderCopy(Renderer, Background, NULL, NULL);
 
         tracks.Draw(time);
+        pattern.Draw(time);
 
         // Put shadow downside
         SDL_Rect fillRect = {0, SCREEN_HEIGHT / 6 * 5, SCREEN_WIDTH, SCREEN_HEIGHT / 6};
@@ -124,6 +118,7 @@ void main_loop() {
         // Render
         SDL_RenderPresent(Renderer);
         
+        // Play sound
         pattern.Play(time);
     }
     printf("%d\n", loop_cnt);
@@ -144,6 +139,7 @@ int main(int argc, char * argv[])
         return 1;
     if (!load_texture())
         return 1;
+    //test_ease(inoutquad);
     main_loop();
     finalize();
     return 0;
