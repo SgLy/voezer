@@ -3,8 +3,25 @@
 char buf[MAX_BUF_LEN];
 char str[MAX_FILE_LEN];
 
+std::string EASE_STRING[] = {
+    "easelinear",
+    "easeoutcirc",
+    "easeincirc",
+    "easeinquad",
+    "easeoutquad",
+    "easeinoutquad",
+    "easeinback",
+    "easeoutback",
+    "easeinoutback",
+    "easeoutinback"
+};
+
 double sqr(double x) {
     return x * x;
+}
+
+double cub(double x) {
+    return x * x * x;
 }
 
 double linear(double start, double end, double from, double to, double x) {
@@ -38,10 +55,51 @@ double inoutquad(double start, double end, double from, double to, double x) {
         return outquad((end - start) / 2 + start, end, (to - from) / 2 + from, to, x);
 }
 
+double bezier(double p1, double p2, double x) {
+    return 3 * x * sqr(1 - x) * p1 + 3 * sqr(x) * (1 - x) * p2 + cub(x);
+}
+
+double bezier_gety(double x1, double y1, double x2, double y2, double x) {
+    double l, r, mid;
+    for (l = 0, r = 1; fabs(r - l) > 1e-6;) {
+        mid = (l + r) / 2;
+        double t = bezier(x1, x2, mid);
+        if (t > x)
+            r = mid;
+        else
+            l = mid;
+    }
+   return bezier(y1, y2, (l + r) / 2);
+}
+
+double inback(double start, double end, double from, double to, double x) {
+    x = (x - start) / (end - start);
+    double res = bezier_gety(0.6, -0.28, 0.755, 0.045, x);
+    return res * (to - from) + from;
+}
+
+double outback(double start, double end, double from, double to, double x) {
+    x = (x - start) / (end - start);
+    double res = bezier_gety(0.175, 0.885, 0.32, 1.275, x);
+    return res * (to - from) + from;
+}
+
+double inoutback(double start, double end, double from, double to, double x) {
+    x = (x - start) / (end - start);
+    double res = bezier_gety(0.68, -0.55, 0.265, 1.55, x);
+    return res * (to - from) + from;
+}
+
+double outinback(double start, double end, double from, double to, double x) {
+    x = (x - start) / (end - start);
+    double res = bezier_gety(0.32, 1.55, 0.735, -0.55, x);
+    return res * (to - from) + from;
+}
+
 void test_ease(double (*ease)(double, double, double,  double, double)) {
     FILE * data = fopen("in.dat", "w");
     double start = 2, end = 5;
-    double from = 4, to = 2;
+    double from = 2, to = 4;
     for (double x = start; x <= end; x += 0.01)
         fprintf(data, "%.10lf\t%.10lf\n", x, ease(start, end, from, to, x));
     fclose(data);

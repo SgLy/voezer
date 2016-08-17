@@ -38,7 +38,7 @@ bool init() {
     }
 
     // Create window
-    MainWindow = SDL_CreateWindow("VOEZER - WarpDrive.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    MainWindow = SDL_CreateWindow("VOEZER - citanLu.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (MainWindow == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
@@ -53,12 +53,12 @@ bool init() {
 
 void load_sound() {
     se_beat.load("res/snd/beat.wav");
-    bgm.load("res/song/WarpDrive/song_full.ogg");
+    bgm.load("res/song/citanLu/song_full.ogg");
 }
 
 bool load_texture() {
     Background = NULL;
-    SDL_Surface * loadedSurface = IMG_Load("res/song/WarpDrive/image_blur.png");
+    SDL_Surface * loadedSurface = IMG_Load("res/song/citanLu/image_blur.png");
     if (loadedSurface == NULL) {
         printf("Load image error! SDL_image Error: %s\n", IMG_GetError());
         return false;
@@ -73,8 +73,8 @@ bool load_texture() {
 }
 
 bool parsejson() {
-    tracks = Tracks("res/song/WarpDrive/track.extra.txt", Renderer);
-    pattern = Pattern("res/song/WarpDrive/note.extra.txt", Renderer, &se_beat, &tracks);
+    tracks = Tracks("res/song/citanLu/track.extra.txt", Renderer);
+    pattern = Pattern("res/song/citanLu/note.extra.txt", Renderer, &se_beat, &tracks);
     return true;
 }
 
@@ -139,7 +139,7 @@ int main(int argc, char * argv[])
         return 1;
     if (!load_texture())
         return 1;
-    //test_ease(inoutquad);
+    //test_ease(outinback);
     main_loop();
     finalize();
     return 0;

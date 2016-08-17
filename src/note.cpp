@@ -73,6 +73,8 @@ Note::Note(const rapidjson::Value &val) {
         type = NOTE_SLIDE;
     if (t == "hold")
         type = NOTE_HOLD;
+    if (type != NOTE_HOLD && hold > 0)
+        printf("%s %.10lf\n", val["Type"].GetString(), hold);
 }
 
 bool Note::Play(double time, Sound * beat) {
@@ -84,7 +86,7 @@ bool Note::Play(double time, Sound * beat) {
 }
 
 void Note::Draw(double time, SDL_Renderer * Renderer, Track * track) {
-    if (time > this->time + hold + 0.1)
+    if (time > this->time + hold)
         return;
     int PIXEL_PER_SECOND = SCREEN_HEIGHT, NOTE_SIZE = TRACK_BASIC_WIDTH / 2;
     int y = SCREEN_HEIGHT / 6 * 5 - (this->time - time) * PIXEL_PER_SECOND;
@@ -97,7 +99,7 @@ void Note::Draw(double time, SDL_Renderer * Renderer, Track * track) {
     if (type == NOTE_HOLD) {
         int y2 = SCREEN_HEIGHT / 6 * 5 - (this->time + hold - time) * PIXEL_PER_SECOND;
         int height = NOTE_SIZE + std::min(SCREEN_HEIGHT / 6 * 5 - y2, y - y2);
-        fillRect = {x - NOTE_SIZE / 2, y2, NOTE_SIZE, height};
+        fillRect = {x - NOTE_SIZE / 2, y2 - NOTE_SIZE, NOTE_SIZE, height};
         SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 192);
     }
     if (type == NOTE_SLIDE)

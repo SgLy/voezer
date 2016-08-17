@@ -137,18 +137,11 @@ void TrackAction::read_action(const rapidjson::Value &val) {
     end = val["End"].GetDouble();
     std::string s = val["Ease"].GetString();
     ease = -1;
-    if (s == "easelinear")
-        ease = EASE_LINEAR;
-    if (s == "easeoutcirc")
-        ease = EASE_OUT_CIRC;
-    if (s == "easeincirc")
-        ease = EASE_IN_CIRC;
-    if (s == "easeinquad")
-        ease = EASE_IN_QUAD;
-    if (s == "easeoutquad")
-        ease = EASE_OUT_QUAD;
-    if (s == "easeinoutquad")
-        ease = EASE_INOUT_QUAD;
+    for (EaseType i = 0; i < EASE_TYPE_COUNT; ++i)
+        if (EASE_STRING[i] == s) {
+            ease = i;
+            break;
+        }
     if (ease == -1) {
         printf("New easing function: %s\n", val["Ease"].GetString());
         ease = EASE_LINEAR;
