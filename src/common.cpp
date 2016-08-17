@@ -1,5 +1,7 @@
 #include "common.h"
 
+TTF_Font * font;
+
 char buf[MAX_BUF_LEN];
 char str[MAX_FILE_LEN];
 
@@ -104,3 +106,48 @@ void test_ease(double (*ease)(double, double, double,  double, double)) {
         fprintf(data, "%.10lf\t%.10lf\n", x, ease(start, end, from, to, x));
     fclose(data);
 }
+
+Color::Color() {}
+Color::Color(double r, double g, double b): r(r), g(g), b(b) {}
+Color operator+ (const Color &x, const Color &y) {
+    return Color(x.r + y.r, x.g + y.g, x.b + y.b);
+}
+Color operator- (const Color &x, const Color &y) {
+    return Color(x.r - y.r, x.g - y.g, x.b - y.b);
+}
+Color operator* (const Color &x, double y) {
+    return Color(x.r * y, x.g * y, x.b * y);
+}
+Color operator/ (const Color &x, double y) {
+    return Color(x.r / y, x.g / y, x.b / y);
+}
+
+void SetColor(SDL_Renderer * Renderer, Color c, uint opacity) {
+    int R = int(c.r), G = int(c.g), B = int(c.b), A = int(opacity);
+    SDL_SetRenderDrawColor(Renderer, R, G, B, A);
+}
+
+const Color COLOR_PRESET[] = {
+    Color(255, 127, 127), // 0 Red
+    Color(255, 255, 127), // 1 Light yellow
+    Color(255, 255, 255), // 2 White
+    Color(127, 255, 255), // 3 Cyan
+    Color(127, 255, 127), // 4 Green
+    Color(255, 127,   0), // 5 Orange
+    Color(255, 127, 255), // 6 Pink
+    Color( 96, 135, 255), // 7 Blue
+    Color(127, 255, 127), // 8 Green
+    Color(127, 127, 255), // 9 Purple
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255),
+    Color(255, 255, 255)
+};

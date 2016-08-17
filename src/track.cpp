@@ -40,6 +40,7 @@ Track * Tracks::operator[] (int x) {
     for (uint i = 0; i < track.size(); ++i)
         if (track[i].id == x)
             return &track[i];
+    return &track[0];
 }
 
 // Class Track definition
@@ -75,6 +76,15 @@ void Track::read_track(const rapidjson::Value &val) {
             scale[i].from = size;
         else
             scale[i].from = scale[i - 1].to;
+    }
+
+    colorchange.clear();
+    for (rapidjson::SizeType i = 0; i < val["ColorChange"].Size(); ++i) {
+        colorchange.push_back(TrackAction(val["ColorChange"][i]));
+        if (i == 0)
+            colorchange[i].from = color;
+        else
+            colorchange[i].from = colorchange[i - 1].to;
     }
 }
 
@@ -112,14 +122,56 @@ int Track::GetSize(double time) {
     return int(round(ratio * TRACK_BASIC_WIDTH));
 }
 
+Color Track::GetColor(double time) {
+    Color res = COLOR_PRESET[color];
+
+    if (colorchange.size() > 0)
+        if (time > colorchange.back().end)
+            res = COLOR_PRESET[(int)colorchange.back().to];
+
+    for (uint i = 0; i < colorchange.size(); ++i) {
+        TrackAction action = colorchange[i];
+        if (action.start <= time && time <= action.end) {
+            double ratio = EASE_FUNC[action.ease](action.start, action.end, 0, 1, time);
+            res = COLOR_PRESET[(int)action.from] * (1 - ratio) + COLOR_PRESET[(int)action.to] * ratio;
+            return res;
+        }
+        if (i + 1 == colorchange.size())
+            continue;
+
+        TrackAction next_action = colorchange[i + 1];
+        if (action.end <= time && time <= next_action.start)
+            return COLOR_PRESET[(int)action.to];
+    }
+    return res;
+}
+
 void Track::Draw(double time, SDL_Renderer * Renderer) {
     if (time < start || end < time)
         return;
     int pos = GetPosition(time);
     int size = GetSize(time);
     SDL_Rect fillRect = {pos - size / 2, 0, size, SCREEN_HEIGHT};
-    SDL_SetRenderDrawColor(Renderer, 128, 0, 0, 96);
+    Color c = GetColor(time);
+    SetColor(Renderer, c, 128);
+    //SDL_SetRenderDrawColor(Renderer, 128, 0, 0, 96);
     SDL_RenderFillRect(Renderer, &fillRect);
+
+    char num[10];
+    double t = GetValue(colorchange, time, color);
+    sprintf(num, "%.1lf", t); 
+    if (font == NULL) {
+        font = TTF_OpenFont("res/font/Monaco_Linux.ttf", 24);
+        if (font == NULL)
+            printf("%s\n", TTF_GetError());
+    }
+    SDL_Color white = {255, 255, 255};
+    SDL_Surface * surface = TTF_RenderText_Solid(font, num, white);
+    SDL_Texture * message = SDL_CreateTextureFromSurface(Renderer, surface);
+    fillRect = {pos - 20, SCREEN_HEIGHT / 6 * 5 + 10, 40, 40};
+    SDL_RenderCopy(Renderer, message, NULL, &fillRect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(message);
 }
 
 

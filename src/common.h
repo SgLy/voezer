@@ -5,7 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
+extern TTF_Font * font;
 const int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
 const int TRACK_BASIC_WIDTH = SCREEN_WIDTH / 10;
 
@@ -64,5 +67,20 @@ extern char str[MAX_FILE_LEN];
 
 double sqr(double x);
 
+class Color {
+public:
+    Color(); 
+    Color(double r, double g, double b);
+    friend Color operator+ (const Color &x, const Color &y);
+    friend Color operator- (const Color &x, const Color &y);
+    friend Color operator* (const Color &x, double y);
+    friend Color operator/ (const Color &x, double y);
+    friend void SetColor(SDL_Renderer * Renderer, Color c, uint capacity);
+
+private:
+    double r, g, b;
+};
+
+extern const Color COLOR_PRESET[];
 
 #endif

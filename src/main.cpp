@@ -37,15 +37,20 @@ bool init() {
        return false;
     }
 
+    if (TTF_Init() == -1) {
+        printf("%s\n", TTF_GetError());
+        return false;
+    }
+
     // Create window
-    MainWindow = SDL_CreateWindow("VOEZER - citanLu.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    MainWindow = SDL_CreateWindow("VOEZER - PrayStation.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (MainWindow == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
     } else {
         // Get window surface
         ScreenSurface = SDL_GetWindowSurface(MainWindow);
-        Renderer = SDL_CreateRenderer(MainWindow, -1, SDL_RENDERER_ACCELERATED);
+        Renderer = SDL_CreateRenderer(MainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
     }
     return true; 
@@ -53,12 +58,12 @@ bool init() {
 
 void load_sound() {
     se_beat.load("res/snd/beat.wav");
-    bgm.load("res/song/citanLu/song_full.ogg");
+    bgm.load("res/song/PrayStation/song_full.ogg");
 }
 
 bool load_texture() {
     Background = NULL;
-    SDL_Surface * loadedSurface = IMG_Load("res/song/citanLu/image_blur.png");
+    SDL_Surface * loadedSurface = IMG_Load("res/song/PrayStation/image_blur.png");
     if (loadedSurface == NULL) {
         printf("Load image error! SDL_image Error: %s\n", IMG_GetError());
         return false;
@@ -73,8 +78,8 @@ bool load_texture() {
 }
 
 bool parsejson() {
-    tracks = Tracks("res/song/citanLu/track.extra.txt", Renderer);
-    pattern = Pattern("res/song/citanLu/note.extra.txt", Renderer, &se_beat, &tracks);
+    tracks = Tracks("res/song/PrayStation/track.extra.txt", Renderer);
+    pattern = Pattern("res/song/PrayStation/note.extra.txt", Renderer, &se_beat, &tracks);
     return true;
 }
 
@@ -122,7 +127,7 @@ void main_loop() {
         pattern.Play(time);
     }
     printf("%d\n", loop_cnt);
-    printf("Loop per millisecond: %.10lf\n", (double)loop_cnt / (SDL_GetTicks() - startTime));
+    printf("Loop per second: %.10lf\n", (double)loop_cnt / (SDL_GetTicks() - startTime) * 1000);
 }
 
 void finalize() {

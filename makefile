@@ -1,5 +1,5 @@
 CXX = g++
-SDL_LIB = -lSDL2 -lSDL2_mixer -lSDL2_image
+SDL_LIB = -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf
 SDL_INCLUDE = -I/usr/include
 LOCAL_INCLUDE = -Iinclude
 DEBUG = -Wall -g3

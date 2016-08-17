@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <rapidjson/document.h>
 #include "common.h"
 
@@ -31,6 +32,7 @@ public:
     double GetValue(const std::vector<TrackAction> &actions, double time, double init);
     int GetPosition(double time);
     int GetSize(double time);
+    Color GetColor(double time);
 
 private:
     void read_track(const rapidjson::Value &doc);

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include <SDL2/SDL.h>
 #include <rapidjson/document.h>
 #include "common.h"
@@ -42,7 +43,8 @@ private:
     SDL_Renderer * Renderer;
     Sound * beat;
     std::vector<Note> notes;
-    uint beat_played_cnt;
+    std::vector<double> sounds;
+    uint beat_played;
     Tracks * tracks;
 };
 
