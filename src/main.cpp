@@ -27,7 +27,8 @@ bool init() {
         return false;
     }
 
-    if (!mixer_init())
+    // Initialize SoLoud
+    if (!soloud_init())
         return false;
 
     // Initialize SDL_image
@@ -58,7 +59,7 @@ bool init() {
 }
 
 void load_sound() {
-    se_beat.load("res/snd/beat.wav");
+    se_beat.load("res/snd/beat.ogg");
     bgm.load("res/song/PrayStation/song_full.ogg");
 }
 

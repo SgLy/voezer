@@ -2,21 +2,12 @@
 #define SOUND_H_INCLUDED 1
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+#include <soloud/soloud.h>
+#include <soloud/soloud_wav.h>
 
-bool mixer_init();
+extern SoLoud::Soloud gSoloud;
 
-class Music {
-public:
-	Music();
-    ~Music();
-	Music(const char add[]);
-    void load(const char add[]);
-    void play();
-
-private:
-	Mix_Music * music;
-};
+bool soloud_init();
 
 class Sound {
 public:
@@ -27,7 +18,7 @@ public:
     void play();
 
 private:
-	Mix_Chunk * sound;
+    SoLoud::Wav sound;
 };
 
 #endif

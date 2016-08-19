@@ -1,10 +1,11 @@
 CXX = g++
-SDL_LIB = -lSDL2 -lSDL2_mixer -lSDL2_image -lSDL2_ttf
-SDL_INCLUDE = -I/usr/include
+SDL_LIB = -lSDL2 -lSDL2_image -lSDL2_ttf 
+SOLOUD_LIB = -lsoloud_x64 -lasound
+INCLUDE = -I/usr/include
 LOCAL_INCLUDE = -Iinclude
 DEBUG = -Wall -g3
-CXXFLAGS = -std=c++11 $(SDL_INCLUDE) $(RAPID_JSON_INCLUDE) $(LOCAL_INCLUDE) $(DEBUG)
-LDFLAGS = $(SDL_LIB)
+CXXFLAGS = -std=c++11 $(INCLUDE) $(RAPID_JSON_INCLUDE) $(LOCAL_INCLUDE) $(DEBUG)
+LDFLAGS = $(SDL_LIB) $(SOLOUD_LIB)
 LIB = bin/sound.o bin/track.o bin/common.o bin/note.o
 
 BIN_DIR = bin
