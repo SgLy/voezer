@@ -15,7 +15,9 @@ std::string EASE_STRING[] = {
     "easeinback",
     "easeoutback",
     "easeinoutback",
-    "easeoutinback"
+    "easeoutinback",
+    "easeinexpo",
+    "easeoutexpo"
 };
 
 double sqr(double x) {
@@ -76,26 +78,59 @@ double bezier_gety(double x1, double y1, double x2, double y2, double x) {
 
 double inback(double start, double end, double from, double to, double x) {
     x = (x - start) / (end - start);
-    double res = bezier_gety(0.6, -0.28, 0.755, 0.045, x);
+    double s = 1.70158;
+    double res = sqr(x) * ((1 + s) * x - s);
+    //double res = bezier_gety(0.6, -0.28, 0.755, 0.045, x);
     return res * (to - from) + from;
 }
 
 double outback(double start, double end, double from, double to, double x) {
-    x = (x - start) / (end - start);
-    double res = bezier_gety(0.175, 0.885, 0.32, 1.275, x);
+    x = (x - start) / (end - start) - 1;
+    double s = 1.70158;
+    double res = sqr(x) * ((s + 1) * x + s) + 1;
+    //double res = bezier_gety(0.175, 0.885, 0.32, 1.275, x);
     return res * (to - from) + from;
 }
 
 double inoutback(double start, double end, double from, double to, double x) {
-    x = (x - start) / (end - start);
-    double res = bezier_gety(0.68, -0.55, 0.265, 1.55, x);
-    return res * (to - from) + from;
+    double s = 1.70158 * 1.525;
+    x = (x - start) / (end - start) * 2;
+    double res;
+    if (x < 1)
+        res = sqr(x) * ((s + 1) * x - s);
+    else {
+        x -= 2;
+        res = sqr(x) * ((s + 1) * x + s) + 2;
+    }
+    //double res = bezier_gety(0.68, -0.55, 0.265, 1.55, x);
+    return res * (to - from) / 2 + from;
 }
 
 double outinback(double start, double end, double from, double to, double x) {
+    double s = 1.70158 * 1.525;
+    x = (x - start) / (end - start) * 2;
+    double res;
+    if (x < 1) {
+        x -= 1;
+        res = sqr(x) * ((s + 1) * x + s) + 1;
+    } else {
+        x -= 1;
+        res = sqr(x) * ((s + 1) * x - s) + 1;
+    }
+    //double res = bezier_gety(0.68, -0.55, 0.265, 1.55, x);
+    return res * (to - from) / 2 + from;
+}
+
+double inexpo(double start, double end, double from, double to, double x) {
+    x = (x - start) / (end - start) - 1;
+    double y = pow(2, 10 * x);
+    return y * (to - from) + from;
+}
+
+double outexpo(double start, double end, double from, double to, double x) {
     x = (x - start) / (end - start);
-    double res = bezier_gety(0.32, 1.55, 0.735, -0.55, x);
-    return res * (to - from) + from;
+    double y = pow(2, -10 * x);
+    return y * (from - to) + to;
 }
 
 void test_ease(double (*ease)(double, double, double,  double, double)) {

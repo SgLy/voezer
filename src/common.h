@@ -13,7 +13,7 @@ const int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
 const int TRACK_BASIC_WIDTH = SCREEN_WIDTH / 10;
 
 typedef int EaseType;
-const int EASE_TYPE_COUNT = 10;
+const int EASE_TYPE_COUNT = 12;
 const EaseType
     EASE_LINEAR = 0,
     EASE_OUT_CIRC = 1,
@@ -24,7 +24,9 @@ const EaseType
     EASE_IN_BACK = 6,
     EASE_OUT_BACK = 7,
     EASE_INOUT_BACK = 8,
-    EASE_OUTIN_BACK = 9;
+    EASE_OUTIN_BACK = 9,
+    EASE_IN_EXPO = 10,
+    EASE_OUT_EXPO = 11;
 extern std::string EASE_STRING[];
 
 typedef double (*EaseFunction)(double start, double end, double from, double to, double x);
@@ -39,6 +41,8 @@ double inback(double start, double end, double from, double to, double x);
 double outback(double start, double end, double from, double to, double x);
 double inoutback(double start, double end, double from, double to, double x);
 double outinback(double start, double end, double from, double to, double x);
+double inexpo(double start, double end, double from, double to, double x);
+double outexpo(double start, double end, double from, double to, double x);
 
 const EaseFunction EASE_FUNC[] = {
     linear,
@@ -50,7 +54,9 @@ const EaseFunction EASE_FUNC[] = {
     inback,
     outback,
     inoutback,
-    outinback
+    outinback,
+    outexpo,
+    inexpo
 };
 void test_ease(EaseFunction ease);
 
