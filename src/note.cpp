@@ -109,5 +109,9 @@ void Note::Draw(double time, SDL_Renderer * Renderer, Track * track) {
     if (type == NOTE_SWIPE)
         SDL_SetRenderDrawColor(Renderer, 0, 0, 128, 192);
     SDL_RenderFillRect(Renderer, &fillRect);
+
+    fillRect = {0, y - 1, SCREEN_WIDTH, 2};
+    SetColor(Renderer, Color(0, 0, 0), 63);
+    SDL_RenderFillRect(Renderer, &fillRect);
 }
 

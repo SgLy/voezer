@@ -157,6 +157,10 @@ void Track::Draw(double time, SDL_Renderer * Renderer) {
     //SDL_SetRenderDrawColor(Renderer, 128, 0, 0, 96);
     SDL_RenderFillRect(Renderer, &fillRect);
 
+    fillRect = {pos - 1, 0, 2, SCREEN_HEIGHT / 6 * 5};
+    SetColor(Renderer, Color(0, 0, 0), 128);
+    SDL_RenderFillRect(Renderer, &fillRect);
+
     char num[10];
     double t = GetValue(colorchange, time, color);
     sprintf(num, "%.1lf", t); 
