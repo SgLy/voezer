@@ -51,11 +51,11 @@ bool init() {
     } else {
         // Get window surface
         ScreenSurface = SDL_GetWindowSurface(MainWindow);
-        //Renderer = SDL_CreateRenderer(MainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-        Renderer = SDL_CreateRenderer(MainWindow, -1, SDL_RENDERER_ACCELERATED);
+        Renderer = SDL_CreateRenderer(MainWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        // Renderer = SDL_CreateRenderer(MainWindow, -1, SDL_RENDERER_ACCELERATED);
         SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
     }
-    return true; 
+    return true;
 }
 
 void load_sound() {
@@ -124,7 +124,7 @@ void main_loop() {
 
         // Render
         SDL_RenderPresent(Renderer);
-        
+
         // Play sound
         pattern.Play(time);
     }

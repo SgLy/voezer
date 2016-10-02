@@ -173,16 +173,5 @@ const Color COLOR_PRESET[] = {
     Color( 96, 135, 255), // 7 Blue
     Color(127, 255, 127), // 8 Green
     Color(127, 127, 255), // 9 Purple
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
-    Color(255, 255, 255),
     Color(255, 255, 255)
 };
