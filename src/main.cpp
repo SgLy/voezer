@@ -112,6 +112,9 @@ void main_loop() {
             }
         }
 
+        if (bgm.stopped())
+            quit = true;
+
         double time = speed * double(SDL_GetTicks() - startTime) / 1000;
         loop_cnt++;
 

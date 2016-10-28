@@ -28,7 +28,7 @@ public:
     void load(const char add[]);
     void play();
     void setSpeed(double sp);
-    bool stoped(double current);
+    bool stopped();
 
 private:
     HSTREAM stream;

@@ -37,6 +37,6 @@ void Music::play() {
 void Music::setSpeed(double sp) {
     BASS_ChannelSetAttribute(stream, BASS_ATTRIB_TEMPO, (sp - 1) * 100);
 }
-bool Music::stoped(double current) {
-    return BASS_ChannelIsActive(stream);
+bool Music::stopped() {
+    return !BASS_ChannelIsActive(stream);
 }
