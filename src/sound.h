@@ -2,23 +2,36 @@
 #define SOUND_H_INCLUDED 1
 
 #include <SDL2/SDL.h>
-#include <soloud/soloud.h>
-#include <soloud/soloud_wav.h>
+#include <bass.h>
+#include <bass_fx.h>
 
-extern SoLoud::Soloud gSoloud;
-
-bool soloud_init();
+bool bass_init();
 
 class Sound {
 public:
-	Sound();
+    Sound();
     ~Sound();
-	Sound(const char add[]);
+    Sound(const char add[]);
     void load(const char add[]);
     void play();
 
 private:
-    SoLoud::Wav sound;
+    HSAMPLE sample;
+    HCHANNEL channel;
+};
+
+class Music {
+public:
+    Music();
+    ~Music();
+    Music(const char add[]);
+    void load(const char add[]);
+    void play();
+    void setSpeed(double sp);
+    bool stoped(double current);
+
+private:
+    HSTREAM stream;
 };
 
 #endif

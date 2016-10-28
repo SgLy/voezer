@@ -1,12 +1,12 @@
 CXX = g++
-SDL_LIB = -lSDL2 -lSDL2_image -lSDL2_ttf 
-SOLOUD_LIB = -lsoloud_x64 -lasound
+SDL_LIB = -lSDL2 -lSDL2_image -lSDL2_ttf
+BASS_LIB = -lbass -lbass_fx
 INCLUDE = -I/usr/include
 LOCAL_INCLUDE = -Iinclude
 LOCAL_LIB = -Llib
 DEBUG = -Wall -g3
 CXXFLAGS = -std=c++11 $(INCLUDE) $(RAPID_JSON_INCLUDE) $(LOCAL_INCLUDE) $(DEBUG)
-LDFLAGS = $(LOCAL_LIB) $(SDL_LIB) $(SOLOUD_LIB)
+LDFLAGS = $(LOCAL_LIB) $(SDL_LIB) $(BASS_LIB)
 LIB = bin/sound.o bin/track.o bin/common.o bin/note.o
 
 BIN_DIR = bin
@@ -33,4 +33,4 @@ bin/note.o: src/note.cpp src/note.h
 
 clean:
 	rm -rf $(BIN_DIR)
-	rm main 
+	rm main

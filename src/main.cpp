@@ -10,7 +10,7 @@
 #include "note.h"
 #include "common.h"
 
-Sound bgm;
+Music bgm;
 Sound se_beat;
 Tracks tracks;
 Pattern pattern;
@@ -28,14 +28,14 @@ bool init() {
     }
 
     // Initialize SoLoud
-    if (!soloud_init())
+    if (!bass_init())
         return false;
 
     // Initialize SDL_image
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
         printf("SDL_image cound not initialize! SDL_image Error: %s\n", IMG_GetError());
-       return false;
+        return false;
     }
 
     if (TTF_Init() == -1) {
@@ -44,7 +44,7 @@ bool init() {
     }
 
     // Create window
-    MainWindow = SDL_CreateWindow("VOEZER - PrayStation.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    MainWindow = SDL_CreateWindow("VOEZER - citanLu.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (MainWindow == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
@@ -60,12 +60,12 @@ bool init() {
 
 void load_sound() {
     se_beat.load("res/snd/beat.ogg");
-    bgm.load("res/song/PrayStation/song_full.ogg");
+    bgm.load("res/song/citanLu/song_full.ogg");
 }
 
 bool load_texture() {
     Background = NULL;
-    SDL_Surface * loadedSurface = IMG_Load("res/song/PrayStation/image_blur.png");
+    SDL_Surface * loadedSurface = IMG_Load("res/song/citanLu/image_blur.png");
     if (loadedSurface == NULL) {
         printf("Load image error! SDL_image Error: %s\n", IMG_GetError());
         return false;
@@ -80,18 +80,22 @@ bool load_texture() {
 }
 
 bool parsejson() {
-    tracks = Tracks("res/song/PrayStation/track.extra.txt", Renderer);
-    pattern = Pattern("res/song/PrayStation/note.extra.txt", Renderer, &se_beat, &tracks);
+    tracks = Tracks("res/song/citanLu/track.extra.txt", Renderer);
+    pattern = Pattern("res/song/citanLu/note.extra.txt", Renderer, &se_beat, &tracks);
     return true;
 }
 
 void main_loop() {
-    Uint32 startTime = SDL_GetTicks();
-    bgm.play();
 
     bool quit = false;
     SDL_Event e;
     int loop_cnt = 0;
+
+    double speed = sqrt(0.5);
+    bgm.setSpeed(speed);
+
+    Uint32 startTime = SDL_GetTicks();
+    bgm.play();
 
     while (!quit) {
         while (SDL_PollEvent(&e) != 0) {
@@ -108,7 +112,7 @@ void main_loop() {
             }
         }
 
-        double time = double(SDL_GetTicks() - startTime) / 1000;
+        double time = speed * double(SDL_GetTicks() - startTime) / 1000;
         loop_cnt++;
 
         // Put Background
