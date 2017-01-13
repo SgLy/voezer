@@ -20,7 +20,20 @@ SDL_Surface* ScreenSurface;
 SDL_Texture* Background;
 SDL_Texture* Note;
 
-bool init() {
+const int STR_LEN = 256;
+typedef char cstr[STR_LEN];
+cstr WindowTitle;
+cstr SongBgmAddress, BackgroundImageAddress;
+cstr TrackAddress, NoteAddress;
+
+bool init(const char * SongName = "citanLu") {
+    // Initialize string constants
+    sprintf(WindowTitle, "VOEZER - %s.Special", SongName);
+    sprintf(SongBgmAddress, "res/song/%s/song_full.ogg", SongName);
+    sprintf(BackgroundImageAddress, "res/song/%s/image_blur.png", SongName);
+    sprintf(TrackAddress, "res/song/%s/track.extra.txt", SongName);
+    sprintf(NoteAddress, "res/song/%s/note.extra.txt", SongName);
+
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         printf("SDL_Init Error: %s\n", SDL_GetError());
@@ -44,7 +57,7 @@ bool init() {
     }
 
     // Create window
-    MainWindow = SDL_CreateWindow("VOEZER - citanLu.Special", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    MainWindow = SDL_CreateWindow(WindowTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (MainWindow == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
@@ -60,12 +73,12 @@ bool init() {
 
 void load_sound() {
     se_beat.load("res/snd/beat.ogg");
-    bgm.load("res/song/citanLu/song_full.ogg");
+    bgm.load(SongBgmAddress);
 }
 
 bool load_texture() {
     Background = NULL;
-    SDL_Surface * loadedSurface = IMG_Load("res/song/citanLu/image_blur.png");
+    SDL_Surface * loadedSurface = IMG_Load(BackgroundImageAddress);
     if (loadedSurface == NULL) {
         printf("Load image error! SDL_image Error: %s\n", IMG_GetError());
         return false;
@@ -80,8 +93,8 @@ bool load_texture() {
 }
 
 bool parsejson() {
-    tracks = Tracks("res/song/citanLu/track.extra.txt", Renderer);
-    pattern = Pattern("res/song/citanLu/note.extra.txt", Renderer, &se_beat, &tracks);
+    tracks = Tracks(TrackAddress, Renderer);
+    pattern = Pattern(NoteAddress, Renderer, &se_beat, &tracks);
     return true;
 }
 
@@ -146,8 +159,17 @@ void finalize() {
 
 int main(int argc, char * argv[])
 {
-    if (!init())
-        return 1;
+    if (argc > 1) {
+        if (strcmp(argv[1], "list") == 0) {
+            system("ls res/song");
+            return 0;
+        }
+        if (!init(argv[1]))
+            return 1;
+    } else {
+        if (!init())
+            return 1;
+    }
     load_sound();
     if (!parsejson())
         return 1;
