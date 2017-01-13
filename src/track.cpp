@@ -19,7 +19,7 @@ void Tracks::read_pattern(const char address[]) {
     while (fgets(buf, MAX_BUF_LEN, input_file) != NULL)
         strcat(str, buf);
     fclose(input_file);
-    
+
     rapidjson::Document doc;
     doc.Parse(str);
 
@@ -35,7 +35,7 @@ void Tracks::Draw(double time) {
     for (auto t: track)
         t.Draw(time, Renderer);
 }
-    
+
 Track * Tracks::operator[] (int x) {
     for (uint i = 0; i < track.size(); ++i)
         if (track[i].id == x)
@@ -68,7 +68,7 @@ void Track::read_track(const rapidjson::Value &val) {
         else
             move[i].from = move[i - 1].to;
     }
-    
+
     scale.clear();
     for (rapidjson::SizeType i = 0; i < val["Scale"].Size(); ++i) {
         scale.push_back(TrackAction(val["Scale"][i]));
@@ -106,7 +106,7 @@ double Track::GetValue(const std::vector<TrackAction> &actions, double time, dou
 
         TrackAction next_action = actions[i + 1];
         if (action.end <= time && time <= next_action.start)
-            return action.to; 
+            return action.to;
     }
     return res;
 }
@@ -161,9 +161,10 @@ void Track::Draw(double time, SDL_Renderer * Renderer) {
     SetColor(Renderer, Color(0, 0, 0), 128);
     SDL_RenderFillRect(Renderer, &fillRect);
 
+#ifdef DEBUG
     char num[10];
     double t = GetValue(colorchange, time, color);
-    sprintf(num, "%.1lf", t); 
+    sprintf(num, "%.1lf", t);
     if (font == NULL) {
         font = TTF_OpenFont("res/font/Monaco_Linux.ttf", 24);
         if (font == NULL)
@@ -176,6 +177,7 @@ void Track::Draw(double time, SDL_Renderer * Renderer) {
     SDL_RenderCopy(Renderer, message, NULL, &fillRect);
     SDL_FreeSurface(surface);
     SDL_DestroyTexture(message);
+#endif
 }
 
 

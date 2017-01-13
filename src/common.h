@@ -75,7 +75,7 @@ double sqr(double x);
 
 class Color {
 public:
-    Color(); 
+    Color();
     Color(double r, double g, double b);
     friend Color operator+ (const Color &x, const Color &y);
     friend Color operator- (const Color &x, const Color &y);

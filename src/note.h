@@ -23,7 +23,7 @@ public:
 private:
     int id, track, dir;
     double time, hold;
-	NoteType type;
+    NoteType type;
 };
 
 class Pattern {

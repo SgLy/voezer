@@ -20,7 +20,7 @@ private:
     void read_action(const rapidjson::Value &val);
     double from, to, start, end;
     EaseType ease;
-};      
+};
 
 class Track {
     friend class Tracks;

@@ -19,7 +19,7 @@ void Pattern::read_pattern(const char address[]) {
     while (fgets(buf, MAX_BUF_LEN, input_file) != NULL)
         strcat(str, buf);
     fclose(input_file);
-    
+
     rapidjson::Document doc;
     doc.Parse(str);
 
@@ -110,8 +110,10 @@ void Note::Draw(double time, SDL_Renderer * Renderer, Track * track) {
         SDL_SetRenderDrawColor(Renderer, 0, 0, 128, 192);
     SDL_RenderFillRect(Renderer, &fillRect);
 
+#ifdef DEBUG
     fillRect = {0, y - 1, SCREEN_WIDTH, 2};
     SetColor(Renderer, Color(0, 0, 0), 63);
     SDL_RenderFillRect(Renderer, &fillRect);
+#endif
 }
 

@@ -91,7 +91,7 @@ void main_loop() {
     SDL_Event e;
     int loop_cnt = 0;
 
-    double speed = sqrt(0.5);
+    double speed = 1;
     bgm.setSpeed(speed);
 
     Uint32 startTime = SDL_GetTicks();
